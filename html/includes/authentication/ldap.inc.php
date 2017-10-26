@@ -350,3 +350,25 @@ function get_ldap_connection($skip_bind = false)
     ldap_set_option($ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
     return $ldap_connection;
 }
+
+/**
+ * Indicates if the authentication happens within the LibreNMS process, or external to it.
+ * If the former, LibreNMS supplies the username. If the latter, the authenticator supplies it via get_external_username().
+ * This is an important distinction, because at the point this is called, if the authentication happens out of process, the user is already authenticated.
+ *
+ * @return bool
+ */
+function auth_external()
+{
+    return false;
+}
+
+/**
+ * The username provided by an external authenticatior.
+ *
+ * @return string|null
+ */
+function get_external_username()
+{
+    return null;
+}

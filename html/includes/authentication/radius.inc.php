@@ -135,3 +135,25 @@ function update_user($user_id, $realname, $level, $can_modify_passwd, $email)
 {
     dbUpdate(array('realname' => $realname, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
 }
+
+/**
+ * Indicates if the authentication happens within the LibreNMS process, or external to it.
+ * If the former, LibreNMS supplies the username. If the latter, the authenticator supplies it via get_external_username().
+ * This is an important distinction, because at the point this is called, if the authentication happens out of process, the user is already authenticated.
+ *
+ * @return bool
+ */
+function auth_external()
+{
+    return false;
+}
+
+/**
+ * The username provided by an external authenticatior.
+ *
+ * @return string|null
+ */
+function get_external_username()
+{
+    return null;
+}
