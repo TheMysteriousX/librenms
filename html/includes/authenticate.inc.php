@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Exceptions\AuthenticationException;
 
@@ -28,7 +29,7 @@ session_start();
 
 if ($vars['page'] == 'logout' && session_authenticated()) {
     log_out_user();
-    header('Location: ' . $config['base_url']);
+    header('Location: ' . Config::get('post_logout_action', Config::get('base_url')));
     exit;
 }
 
