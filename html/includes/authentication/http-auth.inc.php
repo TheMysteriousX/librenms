@@ -151,8 +151,9 @@ function update_user($user_id, $realname, $level, $can_modify_passwd, $email)
  *
  * @return bool
  */
-function auth_external() {
-    return FALSE;
+function auth_external()
+{
+    return true;
 }
 
 /**
@@ -160,6 +161,11 @@ function auth_external() {
  *
  * @return string|null
  */
-function get_external_username() {
-    return NULL;
+function get_external_username()
+{
+    if (isset($_SERVER['REMOTE_USER'])) {
+        return clean($_SERVER['REMOTE_USER']);
+    } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+        return clean($_SERVER['PHP_AUTH_USER']);
+    }
 }
