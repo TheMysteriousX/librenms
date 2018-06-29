@@ -87,7 +87,11 @@ class Config
         require $install_dir . '/includes/vmware_guestid.inc.php';
 
         // Load user config
-        @include $install_dir . '/config.php';
+        if (env('LIBRENMS_CONFIG_FILE', false)) {
+            @include env('LIBRENMS_CONFIG_FILE', false);
+        } else {
+            @include $install_dir . '/config.php';
+        }
 
         return $config;
     }
