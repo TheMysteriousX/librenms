@@ -338,12 +338,12 @@ function check_unit($passthru = false, $command_only = false, $options = array()
 {
     echo 'Running unit tests... ';
 
-    $phpunit_bin = check_exec('phpunit');
+    $phpunit_bin = check_exec('paratest');
 
-    $phpunit_cmd = "$phpunit_bin --colors=always";
+    $phpunit_cmd = "$phpunit_bin --colors";
 
     if ($options['fail_fast']) {
-        $phpunit_cmd .= ' --stop-on-error --stop-on-failure';
+        $phpunit_cmd .= ' --stop-on-failure';
     }
 
     if ($options['os']) {
