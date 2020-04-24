@@ -340,10 +340,10 @@ function check_unit($passthru = false, $command_only = false, $options = array()
 
     $phpunit_bin = check_exec('paratest');
 
-    $phpunit_cmd = "$phpunit_bin --colors";
+    $phpunit_cmd = "$phpunit_bin --colors -p4";
 
     if ($options['fail_fast']) {
-        $phpunit_cmd .= ' --stop-on-failure';
+        $phpunit_cmd .= ' --stop-on-failure --passthru="--stop-on-error --stop-on-failure"';
     }
 
     if ($options['os']) {
