@@ -27,8 +27,7 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -f
   - sudo apt-get install -y fping python3-pip python3-setuptools
-  - apt-get build-dep snmp
-  - mkdir ns
+  - sudo apt-get build-dep snmp
   - curl -LO https://netcologne.dl.sourceforge.net/project/net-snmp/net-snmp/5.8/net-snmp-5.8.tar.gz
   - tar xvf net-snmp-5.8.tar.gz
   - cd net-snmp-5.8
