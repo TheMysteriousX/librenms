@@ -30,9 +30,9 @@ before_install:
   - curl -LO http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/snmp_5.8+dfsg-2ubuntu2_amd64.deb
   - curl -LO http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
   - curl -LO http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
-  - sudo dpkg -i --force-depends libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
-  - sudo dpkg -i --force-depends libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
-  - sudo dpkg -i --force-depends snmp_5.8+dfsg-2ubuntu2_amd64.deb
+  - sudo dpkg -i --auto-deconfigure --force-depends libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
+  - sudo dpkg -i --auto-deconfigure --force-depends libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
+  - sudo dpkg -i --auto-deconfigure --force-depends snmp_5.8+dfsg-2ubuntu2_amd64.deb
   - sudo mysql -e "CREATE USER 'root'@'%' IDENTIFIED BY ''; ALTER USER 'root'@'localhost' IDENTIFIED BY ''; GRANT ALL PRIVILEGES on *.* TO 'root'@'%'; FLUSH PRIVILEGES;";
   - sudo mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
   - cp tests/config/config.test.php config.php
