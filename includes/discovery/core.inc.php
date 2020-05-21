@@ -4,7 +4,6 @@ use LibreNMS\Config;
 use LibreNMS\OS;
 
 $snmpdata = snmp_get_multi_oid($device, ['sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OUQn', 'SNMPv2-MIB');
-$d[] = $snmpdata['.1.3.6.1.2.1.1.1.0'];
 $deviceModel = DeviceCache::getPrimary();
 $deviceModel->fill([
     'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
@@ -19,7 +18,6 @@ foreach ($deviceModel->getDirty() as $attribute => $value) {
 
 // detect OS
 $deviceModel->os = getHostOS($device, false);
-$d[] = $deviceModel;
 if ($deviceModel->isDirty('os')) {
     Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os, $deviceModel, 'system', 3);
     $device['os'] = $deviceModel->os;
@@ -28,13 +26,10 @@ if ($deviceModel->isDirty('os')) {
 }
 
 $deviceModel->save();
-$d[] = $deviceModel;
 load_os($device);
 load_discovery($device);
 $os = OS::make($device);
-$d[] = $device;
 
-die(print_r($d));
 echo "OS: " . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
 
 register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', []), 'includes/discovery/os/' . $device['os'] . '.inc.php');
