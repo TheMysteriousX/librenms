@@ -27,14 +27,14 @@ before_install:
   - curl -O http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/snmp_5.8+dfsg-2ubuntu2_amd64.deb
   - curl -O http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
   - curl -O http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
-  - dpkg -i libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
-  - dpkg -i libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
-  - dpkg -i snmp_5.8+dfsg-2ubuntu2_amd64.deb
+  - sudo dpkg -i libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
+  - sudo dpkg -i libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
+  - sudo dpkg -i snmp_5.8+dfsg-2ubuntu2_amd64.deb
   - sudo apt-get -qq update
-  - apt-get install -f
-  - dpkg -i libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
-  - dpkg -i libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
-  - dpkg -i snmp_5.8+dfsg-2ubuntu2_amd64.deb
+  - sudo apt-get install -f
+  - sudo dpkg -i libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
+  - sudo dpkg -i libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
+  - sudo dpkg -i snmp_5.8+dfsg-2ubuntu2_amd64.deb
   - sudo apt-get install -y fping python3-pip python3-setuptools
   - sudo mysql -e "CREATE USER 'root'@'%' IDENTIFIED BY ''; ALTER USER 'root'@'localhost' IDENTIFIED BY ''; GRANT ALL PRIVILEGES on *.* TO 'root'@'%'; FLUSH PRIVILEGES;";
   - sudo mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
