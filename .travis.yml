@@ -29,7 +29,7 @@ before_install:
   - sudo mysql -e "CREATE USER 'root'@'%' IDENTIFIED BY ''; ALTER USER 'root'@'localhost' IDENTIFIED BY ''; GRANT ALL PRIVILEGES on *.* TO 'root'@'%'; FLUSH PRIVILEGES;";
   - sudo mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
   - cp tests/config/config.test.php config.php
-  - cp php.ini /etc/php.ini
+  - sudo cp php.ini /etc/php.ini
 
 install:
   - travis_retry composer install --no-interaction --prefer-dist --no-suggest
