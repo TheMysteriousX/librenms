@@ -26,13 +26,16 @@ cache:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -f
-  - sudo apt-get install -y snmp fping python3-pip python3-setuptools
-  - curl -LO http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/snmp_5.8+dfsg-2ubuntu2_amd64.deb
-  - curl -LO http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
-  - curl -LO http://mirrors.kernel.org/ubuntu/pool/main/n/net-snmp/libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
-  - sudo dpkg -i --auto-deconfigure --force-depends libsnmp-base_5.8+dfsg-2ubuntu2_all.deb
-  - sudo dpkg -i --auto-deconfigure --force-depends libsnmp35_5.8+dfsg-2ubuntu2_amd64.deb
-  - sudo dpkg -i --auto-deconfigure --force-depends snmp_5.8+dfsg-2ubuntu2_amd64.deb
+  - sudo apt-get install -y fping python3-pip python3-setuptools
+  - apt-get build-dep snmp
+  - mkdir ns
+  - curl -LO https://netcologne.dl.sourceforge.net/project/net-snmp/net-snmp/5.8/net-snmp-5.8.tar.gz
+  - tar xvf net-snmp-5.8.tar.gz
+  - cd net-snmp-5.8
+  - ./configure --prefix=/usr
+  - make
+  - sudo make install
+  - cd ..
   - sudo mysql -e "CREATE USER 'root'@'%' IDENTIFIED BY ''; ALTER USER 'root'@'localhost' IDENTIFIED BY ''; GRANT ALL PRIVILEGES on *.* TO 'root'@'%'; FLUSH PRIVILEGES;";
   - sudo mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
   - cp tests/config/config.test.php config.php
