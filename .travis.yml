@@ -31,7 +31,7 @@ before_install:
   - curl -LO https://netcologne.dl.sourceforge.net/project/net-snmp/net-snmp/5.8/net-snmp-5.8.tar.gz
   - tar xvf net-snmp-5.8.tar.gz
   - cd net-snmp-5.8
-  - ./configure --prefix=/usr --disable-static --enable-shared --enable-as-needed --enable-embedded-perl --enable-ipv6 --enable-local-smux --enable-mfd-rewrites --enable-ucd-snmp-compatibility --with-openssl --with-pic --with-security-modules=tsm  --with-sys-location="Unknown" --with-systemd --with-transports="DTLSUDP TLSTCP" --with-sys-contact="root@localhost"
+  - ./configure --prefix=/usr --disable-static --enable-shared --enable-as-needed --enable-embedded-perl --enable-ipv6 --enable-local-smux --enable-mfd-rewrites --enable-ucd-snmp-compatibility --with-openssl --with-pic --with-security-modules=tsm  --with-sys-location="Unknown" --with-systemd --with-transports="DTLSUDP TLSTCP" --with-sys-contact="root@localhost" --with-logfile="/var/log/snmpd.log" --with-persistent-directory="/var/lib/net-snmp" --with-defaults
   - make
   - sudo make install
   - cd ..
