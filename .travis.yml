@@ -2,8 +2,8 @@ sudo: required
 language: php
 addons:
   chrome: stable
-services:
-  - mysql
+addons:
+  mariadb: 10.4
 env:
   global:
     APP_ENV=testing
