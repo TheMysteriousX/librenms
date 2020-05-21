@@ -31,7 +31,7 @@ $deviceModel->save();
 load_os($device);
 load_discovery($device);
 $os = OS::make($device);
-
+die(print_r($device));
 echo "OS: " . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
 
 register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', []), 'includes/discovery/os/' . $device['os'] . '.inc.php');

@@ -47,7 +47,6 @@ before_script:
 script:
   - php ./validate.php
   - set -e
-  - export FILES=$(git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g')
   - php scripts/pre-commit.php -o ftos --fail-fast
   - test -z "$BROWSER_TEST" || php artisan config:clear
   - test -z "$BROWSER_TEST" || php artisan dusk
