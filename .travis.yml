@@ -2,8 +2,8 @@ sudo: required
 language: php
 addons:
   chrome: stable
-addons:
   mariadb: 10.4
+dist: bionic
 env:
   global:
     APP_ENV=testing
