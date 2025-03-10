@@ -47,69 +47,75 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     $insert_data = [];
     foreach ($arp_data as $ifIndex => $data) {
         $interface = get_port_by_index_cache($device['device_id'], $ifIndex);
-        $port_id = $interface['port_id'];
 
-        $port_arp = array_merge(
-            Arr::wrap($data['IP-MIB::ipNetToMediaPhysAddress'] ?? []),
-            isset($data['IP-MIB::ipNetToPhysicalPhysAddress']) && is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : []
-        );
+        if ($interface) {
+            $port_id = $interface['port_id'];
 
-        echo "{$interface['ifName']}: \n";
-        foreach ($port_arp as $ip => $raw_mac) {
-            $ip = preg_replace('{^\.}', '', $ip, 1);
-            if (empty($ip) || empty($raw_mac) || $raw_mac == '0:0:0:0:0:0' || isset($arp_table[$port_id][$ip])) {
-                continue;
-            }
+            $port_arp = array_merge(
+                Arr::wrap($data['IP-MIB::ipNetToMediaPhysAddress'] ?? []),
+                isset($data['IP-MIB::ipNetToPhysicalPhysAddress']) && is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : []
+            );
 
-            $mac = Mac::parse($raw_mac)->hex();
-            $arp_table[$port_id][$ip] = $mac;
-
-            $index = false;
-            foreach ($existing_data as $existing_key => $existing_value) {
-                if ($existing_value['ipv4_address'] == $ip && $existing_value['port_id'] == $port_id) {
-                    $index = $existing_key;
-                    break;
+            echo "{$interface['ifName']}: \n";
+            foreach ($port_arp as $ip => $raw_mac) {
+                $ip = preg_replace('{^\.}', '', $ip, 1);
+                if (empty($ip) || empty($raw_mac) || $raw_mac == '0:0:0:0:0:0' || isset($arp_table[$port_id][$ip])) {
+                    continue;
                 }
-            }
 
-            if ($index !== false) {
-                $old_mac = $existing_data[$index]['mac_address'];
-                if ($mac != $old_mac && $mac != '') {
-                    d_echo("Changed mac address for $ip from $old_mac to $mac\n");
-                    Eventlog::log("MAC change: $ip : " . Mac::parse($old_mac)->readable() . ' -> ' . Mac::parse($mac)->readable(), $device['device_id'], 'interface', Severity::Warning, $port_id);
-                    dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context_name]);
+                $mac = Mac::parse($raw_mac)->hex();
+                $arp_table[$port_id][$ip] = $mac;
+
+                $index = false;
+                foreach ($existing_data as $existing_key => $existing_value) {
+                    if ($existing_value['ipv4_address'] == $ip && $existing_value['port_id'] == $port_id) {
+                        $index = $existing_key;
+                        break;
+                    }
                 }
-                d_echo("$raw_mac => $ip\n", '.');
-            } elseif (isset($interface['port_id'])) {
-                d_echo("$raw_mac => $ip\n", '+');
-                $insert_data[] = [
-                    'port_id' => $port_id,
-                    'device_id' => $device['device_id'],
-                    'mac_address' => $mac,
-                    'ipv4_address' => $ip,
-                    'context_name' => (string) $context_name,
-                ];
-            }
-        }
-        echo PHP_EOL;
 
-        if (! empty($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'])) {
-            Log::info('IPv6 ND: ');
-            foreach ($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'] as $ipv6 => $raw_mac) {
-                try {
-                    $ipv6_nd = Ipv6Nd::updateOrCreate([
+                if ($index !== false) {
+                    $old_mac = $existing_data[$index]['mac_address'];
+                    if ($mac != $old_mac && $mac != '') {
+                        d_echo("Changed mac address for $ip from $old_mac to $mac\n");
+                        Eventlog::log("MAC change: $ip : " . Mac::parse($old_mac)->readable() . ' -> ' . Mac::parse($mac)->readable(), $device['device_id'], 'interface', Severity::Warning, $port_id);
+                        dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context_name]);
+                    }
+                    d_echo("$raw_mac => $ip\n", '.');
+                } elseif (isset($interface['port_id'])) {
+                    d_echo("$raw_mac => $ip\n", '+');
+                    $insert_data[] = [
                         'port_id' => $port_id,
                         'device_id' => $device['device_id'],
-                        'mac_address' => Mac::parse($raw_mac)->readable(),
-                        'ipv6_address' => IPv6::fromHexString($ipv6)->uncompressed(),
+                        'mac_address' => $mac,
+                        'ipv4_address' => $ip,
                         'context_name' => (string) $context_name,
-                    ]);
-                    echo $ipv6_nd->wasRecentlyCreated ? '+' : ($ipv6_nd->wasChanged() ? 'U' : '.');
-                    $valid_ipv6_ids[] = $ipv6_nd->id;
-                } catch (InvalidIpException $e) {
-                    Log::error($e->getMessage());
+                    ];
                 }
             }
+            echo PHP_EOL;
+
+            if (! empty($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'])) {
+                Log::info('IPv6 ND: ');
+                foreach ($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'] as $ipv6 => $raw_mac) {
+                    try {
+                        $ipv6_nd = Ipv6Nd::updateOrCreate([
+                            'port_id' => $port_id,
+                            'device_id' => $device['device_id'],
+                            'mac_address' => Mac::parse($raw_mac)->readable(),
+                            'ipv6_address' => IPv6::fromHexString($ipv6)->uncompressed(),
+                            'context_name' => (string) $context_name,
+                        ]);
+                        echo $ipv6_nd->wasRecentlyCreated ? '+' : ($ipv6_nd->wasChanged() ? 'U' : '.');
+                        $valid_ipv6_ids[] = $ipv6_nd->id;
+                    } catch (InvalidIpException $e) {
+                        Log::error($e->getMessage());
+                    }
+                }
+            }
+        }
+        else {
+            d_echo("Skipping arp/nd on interface with index $ifIndex - interface not found (hint: was it filtered out with bad_if/bad_if_regexp/bad_iftype/bad_ifoperstatus?)");
         }
     }
 
