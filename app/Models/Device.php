@@ -492,6 +492,74 @@ class Device extends BaseModel
         }
     }
 
+    /**
+     * Get all tags for this device as key=>value array, or a specific tags if $key is provided
+     *
+     * @param array|string|null $key
+     * @return array|null
+     */
+    public function getTag($key = null)
+    {
+       if ($key === null) {
+            return $tags->toArray();
+        }
+
+        $tags = $this->tags()->with('tagKey')->get()->mapWithKeys(function ($tag) {
+            return [$tag->tagKey->key => $tag->value];
+        });
+
+        $t = [];
+        foreach (is_array($key) ? $key : [$key] as $k) {
+            $t += $tags->get($key);
+        }
+
+        return $t;
+    }
+
+    /**
+     * Set one or more tags for this device.
+     *
+     * @param array|null $key
+     */
+    public function setTag($kvp)
+    {
+        if (! is_array($kvp)) {
+            throw new \InvalidArgumentException('$kvp is not an array: ' .  $kvp);
+        }
+
+        foreach ($kvp as $key => $value) {
+            if (! $tagKey->validateValue($value)) {
+                throw new \InvalidArgumentException("Value for tag '$key' does not match type '{$tagKey->type}'");
+            }
+
+            $tagKey = DeviceTagKey::firstOrCreate(
+                ['key' => $key]
+            );
+
+            DeviceTag::updateOrCreate(
+                ['device_id' => $this->device_id, 'tag_key_id' => $tagKey->tag_key_id],
+                ['value' => $value]
+            );
+        }
+    }
+
+    /**
+     * Delete tag or tags for this device by key
+     *
+     * @param array|string $key
+     */
+    public function deleteTag($key)
+    {
+        foreach (is_array($key) ? $key : [$key] as $k) {
+            $tagKey = DeviceTagKey::where('key', $k)->first();
+            if ($tagKey) {
+                DeviceTag::where('device_id', $this->device_id)
+                    ->where('tag_key_id', $tagKey->tag_key_id)
+                    ->delete();
+            }
+        }
+    }
+
     // ---- Accessors/Mutators ----
 
     public function getIconAttribute($icon): string
@@ -1300,6 +1368,14 @@ class Device extends BaseModel
     public function syslogs(): HasMany
     {
         return $this->hasMany(Syslog::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DeviceTag, $this>
+     */
+    public function tags(): HasMany
+    {
+        return $this->hasMany(DeviceTag::class, 'device_id');
     }
 
     /**

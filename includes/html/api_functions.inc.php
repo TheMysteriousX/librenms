@@ -37,6 +37,8 @@ use App\Models\PortsNac;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
+use App\Models\DeviceTag;
+use App\Models\DeviceTagKey;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -3492,4 +3494,169 @@ function server_info()
     return api_success([
         $versions,
     ], 'system');
+}
+
+/**
+ * Get all tags for a device or a specific tag if key is provided.
+ * GET /api/v0/devices/{hostname}/tags[/{key}]
+ *
+ * @param Illuminate\Http\Request $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function get_device_tags(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $key = $request->route('key');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided');
+    }
+
+    $device = \App\Models\Device::findByHostname($hostname);
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    $tags = $device->getTag();
+
+    if ($key !== null) {
+        return api_success([$key => $tags[$key] ?? null], 'tags');
+    }
+    return api_success($tags, 'tags');
+}
+
+/**
+ * Set or update tags for a device.
+ * POST /api/v0/devices/{hostname}/tags
+ * Body: { "tags": { "key1": "value1", ... } }
+ *
+ * @param Illuminate\Http\Request $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function set_device_tags(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $tags = $request->input('tags', []);
+    $visible = $request->input('visible', true);
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided');
+    }
+
+    $device = \App\Models\Device::findByHostname($hostname);
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    if (! is_array($tags) || empty($tags)) {
+        return api_error(400, 'No tags provided');
+    }
+
+    try {
+        $device->setTag($tags, true, $visible);
+    } catch (\InvalidArgumentException $e) {
+        return api_error(422, $e->getMessage());
+    }
+
+    return api_success($tags, 'tags', 'Tags set');
+}
+
+/**
+ * Delete a tag from a device.
+ * DELETE /api/v0/devices/{hostname}/tags/{key}
+ *
+ * @param Illuminate\Http\Request $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function delete_device_tag(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $key = $request->route('key');
+
+    if (empty($hostname) || empty($key)) {
+        return api_error(400, 'Hostname and tag key required');
+    }
+
+    $device = \App\Models\Device::findByHostname($hostname);
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    $device->deleteTag($key);
+
+    return api_success(null, 'tags');
+}
+
+/**
+ * Define a tag key with a type.
+ * POST /api/v0/devices/{hostname}/tags/define
+ * Body: { "key": "mykey", "type": "string", "visible": true }
+ *
+ * @param Illuminate\Http\Request $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function define_device_tag_key(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $key = $request->input('key');
+    $type = $request->input('type', 'string');
+    $visible = $request->input('visible', true);
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided');
+    }
+    if (empty($key)) {
+        return api_error(400, 'No tag key provided');
+    }
+    if (!in_array($type, \App\Models\DeviceTagKey::$allowedTypes, true)) {
+        return api_error(422, "Invalid type '$type'. Allowed: " . implode(', ', \App\Models\DeviceTagKey::$allowedTypes));
+    }
+
+    $tagKey = \App\Models\DeviceTagKey::firstOrCreate(
+        ['key' => $key],
+        ['type' => $type, 'visible' => $visible]
+    );
+
+    $result = [ 'key' => $tagKey->key, 
+                'type' => $tagKey->type,
+                'visible' => $tagKey->visible
+            ];
+
+    return api_success($result, 'tag_key');
+}
+
+/**
+ * List all devices with specified tag/value tuple
+ * GET /api/v0/tags/{key}
+ * GET /api/v0/tags/{key}/{value}
+ *
+ * @param Illuminate\Http\Request $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function list_device_tag(Illuminate\Http\Request $request)
+{
+    $key = $request->route('key');
+    $value = $request->route('value');
+
+    if (empty($key)) {
+        return api_error(400, 'Tag key is required');
+    }
+
+    $tagQuery = \App\Models\DeviceTag::query()->where('key', $key);
+    if ($value !== null) {
+        $tagQuery->where('value', $value);
+    }
+    $tags = $tagQuery->with('device')->get();
+
+    $result = [];
+    foreach ($tags as $tag) {
+        if ($tag->device) {
+            $result[] = [
+                'hostname' => $tag->device->hostname,
+                'key' => $tag->key,
+                'value' => $tag->value,
+            ];
+        }
+    }
+    return api_success($result, 'devices');
 }
