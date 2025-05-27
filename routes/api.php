@@ -38,8 +38,8 @@ Route::prefix('v0')->group(function () {
         Route::get('routing/ipsec/data/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'list_ipsec'])->name('list_ipsec');
         Route::get('services', [App\Api\Controllers\LegacyApiController::class, 'list_services'])->name('list_services');
         Route::get('services/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'list_services'])->name('list_services_device');
-        Route::get('tags/{key}', [App\Api\Controllers\LegacyApiController::class,'list_tags'])->name('list_tags_by_key');
-        Route::get('tags/{key}/{value}', [App\Api\Controllers\LegacyApiController::class,'list_tags'])->name('list_tags_by_key_value');
+        Route::get('tags/{key}', [App\Api\Controllers\LegacyApiController::class, 'list_tags'])->name('list_tags_by_key');
+        Route::get('tags/{key}/{value}', [App\Api\Controllers\LegacyApiController::class, 'list_tags'])->name('list_tags_by_key_value');
 
         Route::prefix('resources')->group(function () {
             Route::get('links/{id}', [App\Api\Controllers\LegacyApiController::class, 'get_link'])->name('get_link');
@@ -108,7 +108,7 @@ Route::prefix('v0')->group(function () {
         Route::patch('services/{id}', [App\Api\Controllers\LegacyApiController::class, 'edit_service_for_host'])->name('edit_service_for_host');
         Route::post('bgp/{id}', [App\Api\Controllers\LegacyApiController::class, 'edit_bgp_descr'])->name('edit_bgp_descr');
         Route::post('syslogsink', [App\Api\Controllers\LegacyApiController::class, 'post_syslogsink'])->name('post_syslogsink');
-        Route::post('tags/define', [App\Api\Controllers\LegacyApiController::class,'define_device_tag_key'])->name('define_device_tag_key');
+        Route::post('tags/define', [App\Api\Controllers\LegacyApiController::class, 'define_device_tag_key'])->name('define_device_tag_key');
 
         Route::get('poller_group/{poller_group_id_or_name?}', [App\Api\Controllers\LegacyApiController::class, 'get_poller_group'])->name('get_poller_group');
     });

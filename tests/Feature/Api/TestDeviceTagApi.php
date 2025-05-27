@@ -3,9 +3,7 @@
 namespace LibreNMS\Tests\Feature\Api;
 
 use App\Models\Device;
-use App\Models\DeviceTagKey;
 use App\Models\User;
-use LibreNMS\Config;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
 class TestDeviceTagApi extends InMemoryDbTestCase

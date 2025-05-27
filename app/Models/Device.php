@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -496,7 +495,7 @@ class Device extends BaseModel
     /**
      * Get all tags for this device as key=>value array, or a specific tags if $key is provided
      *
-     * @param array|string|null $key
+     * @param  array|string|null  $key
      * @return array<string, string|null>|null
      */
     public function getTag($key = null)
@@ -505,7 +504,7 @@ class Device extends BaseModel
             return [$tag->tagKey->key => $tag->value];
         });
 
-       if (! $key) {
+        if (! $key) {
             return $tags->all();
         }
 
@@ -515,7 +514,7 @@ class Device extends BaseModel
     /**
      * Set one or more tags for this device.
      *
-     * @param array|null $kvp
+     * @param  array|null  $kvp
      * @return App\Models\Illuminate\Support\Collection<string, string|null>|null
      */
     public function setTag($kvp)
@@ -534,7 +533,7 @@ class Device extends BaseModel
     /**
      * Delete tag or tags for this device by key
      *
-     * @param array|string $key
+     * @param  array|string  $key
      * @return array|null
      */
     public function deleteTag($key)

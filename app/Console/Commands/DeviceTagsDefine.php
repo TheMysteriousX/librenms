@@ -20,7 +20,7 @@ class DeviceTagsDefine extends LnmsCommand
         parent::__construct();
 
         $this->addArgument('tags', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Tag or list of tags to define');
-        $this->addOption('json', 'j', InputOption::VALUE_NONE, "Output results as JSON");
+        $this->addOption('json', 'j', InputOption::VALUE_NONE, 'Output results as JSON');
         $this->addOption('type', 't', InputOption::VALUE_OPTIONAL, "Tag type ({implode(', ', \\App\\Models\\DeviceTagKey::\$allowedTypes)})", 'string');
         $this->addOption('hidden', null, InputOption::VALUE_NONE, 'Set tag visibility (default: visible)');
     }
@@ -45,22 +45,25 @@ class DeviceTagsDefine extends LnmsCommand
             $result[] = [
                 'key' => $tagKey->key,
                 'type' => $tagKey->type,
-                'visible' => $tagKey->visible ? 'true' : 'false'
+                'visible' => $tagKey->visible ? 'true' : 'false',
             ];
         }
 
         $this->renderOutput($result);
+
         return 0;
     }
 
-    private function renderOutput(iterable $tags): void {
+    private function renderOutput(iterable $tags): void
+    {
         if ($tags) {
             if ($this->option('json')) {
                 $this->line(json_encode($tags));
+
                 return;
             }
 
-            foreach($tags as $value) {
+            foreach ($tags as $value) {
                 $this->line("{$value['key']}.key=" . $value['key']);
                 $this->line("{$value['key']}.type=" . $value['type']);
                 $this->line("{$value['key']}.visible=" . ($value['visible'] ? 'true' : 'false'));

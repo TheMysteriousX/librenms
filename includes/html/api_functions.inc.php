@@ -37,8 +37,6 @@ use App\Models\PortsNac;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
-use App\Models\DeviceTag;
-use App\Models\DeviceTagKey;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -3500,7 +3498,7 @@ function server_info()
  * Get all tags for a device or a specific tag if key is provided
  * GET /api/v0/devices/{hostname}/tags/{key}
  *
- * @param Illuminate\Http\Request $request
+ * @param  Illuminate\Http\Request  $request
  * @return Illuminate\Http\JsonResponse
  */
 function get_device_tags(Illuminate\Http\Request $request)
@@ -3528,7 +3526,7 @@ function get_device_tags(Illuminate\Http\Request $request)
  * POST /api/v0/devices/{hostname}/tags
  * Body: { "key1": "value1", ... }
  *
- * @param Illuminate\Http\Request $request
+ * @param  Illuminate\Http\Request  $request
  * @return Illuminate\Http\JsonResponse
  */
 function set_device_tags(Illuminate\Http\Request $request)
@@ -3556,7 +3554,7 @@ function set_device_tags(Illuminate\Http\Request $request)
  * Delete a tag from a device.
  * DELETE /api/v0/devices/{hostname}/tags/{key}
  *
- * @param Illuminate\Http\Request $request
+ * @param  Illuminate\Http\Request  $request
  * @return Illuminate\Http\JsonResponse
  */
 function delete_device_tag(Illuminate\Http\Request $request)
@@ -3585,7 +3583,7 @@ function delete_device_tag(Illuminate\Http\Request $request)
  * POST /api/v0/devices/{hostname}/tags/define
  * Body: { "key": "mykey", "type": "string", "visible": true }
  *
- * @param Illuminate\Http\Request $request
+ * @param  Illuminate\Http\Request  $request
  * @return Illuminate\Http\JsonResponse
  */
 function define_device_tag_key(Illuminate\Http\Request $request)
@@ -3602,7 +3600,7 @@ function define_device_tag_key(Illuminate\Http\Request $request)
         $result[] = [
             'key' => $tagKey->key,
             'type' => $tagKey->type,
-            'visible' => $tagKey->visible ? 'true' : 'false'
+            'visible' => $tagKey->visible ? 'true' : 'false',
         ];
     }
 
@@ -3614,7 +3612,7 @@ function define_device_tag_key(Illuminate\Http\Request $request)
  * GET /api/v0/tags/{key}
  * GET /api/v0/tags/{key}/{value}
  *
- * @param Illuminate\Http\Request $request
+ * @param  Illuminate\Http\Request  $request
  * @return Illuminate\Http\JsonResponse
  */
 function list_device_tag(Illuminate\Http\Request $request)
@@ -3631,7 +3629,7 @@ function list_device_tag(Illuminate\Http\Request $request)
     if ($value !== null) {
         $tagQuery->where('value', $value);
     }
-    
+
     $tags = $tagQuery->with('parentDevice')->get();
 
     $result = [];
@@ -3644,5 +3642,6 @@ function list_device_tag(Illuminate\Http\Request $request)
             ];
         }
     }
+
     return api_success($result, 'devices');
 }

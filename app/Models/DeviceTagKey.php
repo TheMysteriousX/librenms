@@ -44,7 +44,7 @@ class DeviceTagKey extends Model implements Keyable
     /**
      * Validate a value against this key's type
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     public function validateValue(mixed $value)
@@ -76,7 +76,7 @@ class DeviceTagKey extends Model implements Keyable
     /**
      * Validate a tag key string
      *
-     * @param string $key
+     * @param  string  $key
      * @return bool
      */
     public static function isValidKey(string $key): bool
@@ -88,7 +88,7 @@ class DeviceTagKey extends Model implements Keyable
     /**
      * Get the key attribute, always lowercased
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     public function getKeyAttribute(string $value)
@@ -99,13 +99,14 @@ class DeviceTagKey extends Model implements Keyable
     /**
      * Set the key attribute, always lowercased and validated
      *
-     * @param string $value
+     * @param  string  $value
+     *
      * @throws \InvalidArgumentException
      */
     public function setKeyAttribute(string $value)
     {
         $value = mb_strtolower($value, 'UTF-8');
-        if (!self::isValidKey($value)) {
+        if (! self::isValidKey($value)) {
             throw new \InvalidArgumentException('Tag key must contain only lowercase letters, numbers, and the following characters: _-/\#.@');
         }
 
@@ -115,12 +116,13 @@ class DeviceTagKey extends Model implements Keyable
     /**
      * Set the type attribute, validated against self::$allowedTypes
      *
-     * @param string $value
+     * @param  string  $value
+     *
      * @throws \InvalidArgumentException
      */
     public function setTypeAttribute(string $value)
     {
-        if (!self::isValidType($value)) {
+        if (! self::isValidType($value)) {
             throw new \InvalidArgumentException("Invalid type '$value', must be one of: " . implode(', ', self::$allowedTypes));
         }
 

@@ -4,13 +4,10 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
 use App\Models\DeviceTagKey;
-use App\Models\User;
-use LibreNMS\Config;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
 class DeviceTagTest extends InMemoryDbTestCase
 {
-
     public function test_set_and_get_tags_various_types()
     {
         $device = Device::factory()->create();

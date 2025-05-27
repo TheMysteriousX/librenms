@@ -3,8 +3,6 @@
 namespace LibreNMS\Tests\Feature\Commands;
 
 use App\Models\Device;
-use App\Models\DeviceTagKey;
-use LibreNMS\Config;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
 class TestDeviceTagCommand extends InMemoryDbTestCase
